@@ -27,8 +27,8 @@ class Scriptor:
         self.window.protocol("WM_DELETE_WINDOW", self.closeWindow)
         self.window.mainloop()
 
-    def winfo_isMaximized(self, win_obj):
-        return (win_obj.winfo_width() == win_obj.winfo_screenwidth() or win_obj.winfo_height() == win_obj.winfo_screenheight())
+    def winfo_isMaximized(self, tk_obj):
+        return (tk_obj.winfo_width() == tk_obj.winfo_screenwidth() or tk_obj.winfo_height() == tk_obj.winfo_screenheight())
     
     def loadDefaultSettings(self):
         self.window.width = "800"
