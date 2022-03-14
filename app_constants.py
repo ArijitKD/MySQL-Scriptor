@@ -1,5 +1,4 @@
 # CONSTANTS
-
 APP_NAME = "MySQL Scriptor"
 APP_VERSION = "1.0.0"
 CONFIG_FILE = "settings.ini"
