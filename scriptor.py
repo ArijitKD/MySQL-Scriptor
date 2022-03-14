@@ -1,15 +1,11 @@
+import os
+import traceback as tb
 import tkinter as tk
+
 from tkinter import messagebox as mbox
 from tkinter import filedialog as fldg
-import traceback as tb
-import os
+from app_constants import *
 
-# CONSTANTS
-APP_NAME = "MySQL Scriptor"
-APP_VERSION = "1.0.0"
-CONFIG_FILE = "settings.ini"
-WINDOW_MIN_WIDTH = "640"
-WINDOW_MIN_HEIGHT = "480"
 
 class Scriptor:
     def run(self):
