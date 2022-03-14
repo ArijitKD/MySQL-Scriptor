@@ -8,11 +8,6 @@ import os
 APP_NAME = "MySQL Scriptor"
 APP_VERSION = "1.0.0"
 CONFIG_FILE = "settings.ini"
-DEFAULT_CONFIG = ["WindowWidth=800\n",
-                  "WindowHeight=450\n",
-                  "XPosition=80\n",
-                  "YPosition=120\n",
-                  "IsMaximized=false"]
 WINDOW_MIN_WIDTH = "640"
 WINDOW_MIN_HEIGHT = "480"
 
@@ -25,9 +20,7 @@ class Scriptor:
         try:
             self.loadCustomSettings()
         except FileNotFoundError:
-            config_file = open(CONFIG_FILE, "w")
-            config_file.writelines(DEFAULT_CONFIG)
-            config_file.close()
+            pass
         self.window.geometry("{}x{}+{}+{}".format(self.window.width, self.window.height, self.window.xposition, self.window.yposition))
         if (self.window.ismaximized == "true"):
             self.window.state("zoomed")
