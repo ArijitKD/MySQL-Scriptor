@@ -42,15 +42,15 @@ class Scriptor:
             config_file.close()
             for setting in settings:
                 setting = setting.strip().replace(" ", "").lower()
-                if (setting.startswith ("windowwidth")):
+                if (setting.startswith("windowwidth") and setting[setting.index("=")-1]=="h"):
                     self.window.width = setting[setting.index("=")+1:] 
-                if (setting.startswith ("windowheight")):
+                if (setting.startswith("windowheight") and setting[setting.index("=")-1]=="t"):
                     self.window.height = setting[setting.index("=")+1:]
-                if (setting.startswith ("xposition")):
+                if (setting.startswith("xposition") and setting[setting.index("=")-1]=="n"):
                     self.window.xposition = setting[setting.index("=")+1:]
-                if (setting.startswith ("yposition")):
+                if (setting.startswith("yposition") and setting[setting.index("=")-1]=="n"):
                     self.window.yposition = setting[setting.index("=")+1:]
-                if (setting.startswith ("ismaximized")):
+                if (setting.startswith("ismaximized") and setting[setting.index("=")-1]=="d"):
                     self.window.ismaximized = setting[setting.index("=")+1:]
 
     def saveSettings(self, file=CONFIG_FILE):
