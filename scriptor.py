@@ -3,7 +3,7 @@ MySQL Scriptor: Simple script editor that can execute MySQL scripts.
 
 This file is a part of MySQL Scriptor.
 
-Copyright (C) 2021 Arijit Kumar Das (Github: @ArijitKD)
+Copyright (C) 2022 Arijit Kumar Das (Github: @ArijitKD)
 
 MySQL Scriptor is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
