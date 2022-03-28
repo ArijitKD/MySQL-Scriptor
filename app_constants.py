@@ -23,6 +23,7 @@ along with MySQL Scriptor.  If not, see <https://www.gnu.org/licenses/>.
 # CONSTANTS
 APP_NAME = "MySQL Scriptor"
 APP_VERSION = "1.0.0"
+COPYRIGHT_STRING = "Copyright (C) 2022 Arijit Kumar Das (Github: @ArijitKD)"
 CONFIG_FILE = "settings.ini"
 WINDOW_MIN_WIDTH = "640"
 WINDOW_MIN_HEIGHT = "480"
