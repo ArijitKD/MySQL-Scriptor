@@ -28,14 +28,19 @@ import tkinter.ttk as ttk
 from tkinter import messagebox as mbox
 from tkinter import filedialog as fldg
 from app_constants import *
-
-
+    
 class Scriptor:
-    def run(self):
+
+    def __init__(self):
         self.window = tk.Tk()
-        self.window.title("{} ({})".format(APP_NAME, APP_VERSION))
+        self.filename = "Unnamed script"
+        
+    def run(self):
+        print (APP_NAME+"\nVersion: "+APP_VERSION+"\n")
+        print ("============================================    APP LOGS    ============================================")
+        self.update_title(self.filename)
         self.window.minsize(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT)
-        self.addMenuBar()
+        
         self.loadDefaultSettings()
         try:
             self.loadCustomSettings()
@@ -44,16 +49,36 @@ class Scriptor:
         self.window.geometry("{}x{}+{}+{}".format(self.window.width, self.window.height, self.window.xposition, self.window.yposition))
         if (self.window.laststate == "maximized"):
             self.window.state("zoomed")
+
+        self.addMenuBar()
+        self.addEditArea()
+        self.addStatusArea()
+        
         self.window.protocol("WM_DELETE_WINDOW", self.closeWindow)
         self.window.mainloop()
 
     def winfo_isMaximized(self, tk_obj):
         return (tk_obj.winfo_width() == tk_obj.winfo_screenwidth() or tk_obj.winfo_height() == tk_obj.winfo_screenheight())
 
+    def write_status(self, string, write_mode="append"):
+        if (write_mode=="overwrite"):
+            self.statusarea.delete("1.0", "end")
+            self.statusarea.insert(index="1.0", chars=string)
+        elif (write_mode=="append"):
+            self.statusarea.insert(index="end", chars="\n"+string)
+        else:
+            raise tk.TclError("bad write mode \"{}\": must be \"append\" or \"overwrite\"".format(write_mode))
+
+    def update_title(self, filename):
+        self.window.title("{} - {} ({})".format(filename, APP_NAME, APP_VERSION))
+
+    def format_filename(self, filename):
+        return filename.replace("/", "\\") if os.name == "nt" else filename
+
     def addMenuBar(self):
         # Creating Menubar
         self.menubar = tk.Menu(self.window,font=("segoe ui",9))
-        # Configuring menubar on root window
+        # Configuring menubar on window window
         self.window.config(menu=self.menubar)
         # Creating File Menu
         self.filemenu = tk.Menu(self.menubar,font=("segoe ui", 9),tearoff=0)
@@ -90,10 +115,48 @@ class Scriptor:
         # Creating Help Menu
         self.helpmenu = tk.Menu(self.menubar,font=("segoe ui",9),tearoff=0)
         # Adding About Command
-        self.helpmenu.add_command(label="About",command=self.appAbout)
+        self.helpmenu.add_command(label="About "+APP_NAME,command=self.appAbout)
         # Cascading helpmenu to menubar
         self.menubar.add_cascade(label="Help", menu=self.helpmenu)
-    
+
+    def addEditArea(self):
+        # Creating Scrollbar_Y
+        editor_scrol_y = ttk.Scrollbar(self.window,orient="vertical")
+        # Creating Scrollbar_X
+        editor_scrol_x = ttk.Scrollbar(self.window,orient="horizontal")
+        # Creating Text Area
+        self.editarea = tk.Text(self.window, xscrollcommand=editor_scrol_x.set, yscrollcommand=editor_scrol_y.set, wrap="none", font=("Consolas", 12), state="normal", relief="groove", background="#002240", foreground="#fff", insertbackground="#fff")
+        # Adding Scrollbar_x to text area
+        editor_scrol_x.config(command=self.editarea.xview)
+        # Adding Scrollbar_y to text area
+        editor_scrol_y.config(command=self.editarea.yview)
+        # Packing scrollbar_y to root window
+        editor_scrol_y.pack(side="right",fill="y")
+        # Packing Text Area to root window
+        self.editarea.pack(side="top", fill="both",expand=1)
+        # Packing scrollbar_x to root window
+        editor_scrol_x.pack(side="top",fill="x")
+        # Edit area should be focused
+        self.editarea.focus_set()
+
+    def addStatusArea(self):
+        # Creating Scrollbar_Y
+        status_scrol_y = ttk.Scrollbar(self.window, orient="vertical")
+        # Creating Statusbar
+        self.statusarea = tk.Text(self.window, height=10, font=("segoe ui", 9), yscrollcommand=status_scrol_y.set, relief="groove", background="#1f1f1f", foreground="#fff", insertbackground="#fff", wrap="char")
+        # Creating StatusTitlebar
+        self.statusbar = ttk.Label(self.window,font=("segoe ui",10), text="Status Window", relief="groove")
+        # Adding Scrollbar_y to status area
+        status_scrol_y.config(command=self.statusarea.yview)
+        # Packing scrollbar_y to root window
+        status_scrol_y.pack(side="right", fill="both")
+        # Packing StatusTitlebar to root window
+        self.statusbar.pack(side="top",fill="both")
+        # Packing status bar to root window
+        self.statusarea.pack(side="top",fill="both")
+        # Writing the status
+        self.write_status("Ready", write_mode="overwrite")
+        
     def loadDefaultSettings(self):
         self.window.width = "800"
         self.window.height = "450"
@@ -140,13 +203,37 @@ class Scriptor:
         print ("INFO: Configuration settings were saved successfully.")
 
     def createNewFile(self):
+        self.write_status("New script created")
         print ("INFO: New file created.")
+        
 
     def openFile(self):
-        pass
+        # Exception handling
+        try:
+          # Asking for file to open
+          self.filename = fldg.askopenfilename(title = "Open",filetypes = [("MySQL Scripts (*.mysql)","*.mysql"), ("SQL Scripts (*.sql)","*.sql"), ("All Files (*.)","*.*")])
+          self.filename = self.format_filename(self.filename)
+          # checking if filename not none
+          if self.filename:
+            # opening file in readmode
+            infile = open(self.filename,"r")
+            # Clearing text area
+            self.editarea.delete("1.0", "end")
+            # Inserting data Line by line into text area
+            for line in infile:
+              self.editarea.insert("end", line)
+            # Closing the file  
+            infile.close()
+            # Calling Set title
+            #self.settitle()
+            self.update_title(self.filename)
+            self.write_status("Opened {}.".format(self.filename))
+        except Exception as e:
+          mbox.showerror("Exception",e)
             
     def saveFile(self):
         print ("INFO: File saved.")
+        self.write_status("Saved file: {}".format(self.filename))
 
     def saveAsFile(self):
         pass
@@ -183,16 +270,16 @@ class Scriptor:
 {}
 Version: {}
 
-This app is a simple script editor that can execute MySQL scripts.
+{} is a simple script editor that can execute MySQL scripts.
 
-Copyright (C) 2022 Arijit Kumar Das (Github: @ArijitKD)
+{}
 
 {} is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 {} is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with {}.  If not, see <https://www.gnu.org/licenses/>.
-'''.format(APP_NAME, APP_VERSION, APP_NAME, APP_NAME, APP_NAME))
+'''.format(APP_NAME, APP_VERSION, APP_NAME, COPYRIGHT_STRING, APP_NAME, APP_NAME, APP_NAME))
         
         
 if (__name__ == "__main__"):
